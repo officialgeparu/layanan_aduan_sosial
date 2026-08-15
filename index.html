@@ -159,6 +159,46 @@ body.submitting textarea{
 }
 body.submitting{cursor:progress;}
 
+
+/* ===== OPEN DONASI SOSIAL ===== */
+.donasi-card{padding:22px;text-align:center}
+.donasi-card h2{text-align:left}
+.donasi-open-btn{background:var(--navy);border:2px solid var(--red);margin-top:6px}
+.donasi-open-btn:hover{background:#173b5d}
+.donasi-modal{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
+.donasi-modal.show{display:flex}
+.donasi-backdrop{position:absolute;inset:0;background:#0008}
+.donasi-dialog{position:relative;width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px #0007;padding:22px}
+.donasi-close{position:absolute;right:16px;top:14px;width:38px;height:38px;margin:0;padding:0;border-radius:50%;background:#eef2f6;color:var(--navy);font-size:24px;line-height:38px}
+.donasi-title{text-align:center;color:var(--navy);font-size:24px;font-weight:900;margin:2px 42px 5px}
+.donasi-subtitle{text-align:center;color:var(--muted);font-size:13px;margin:0 20px 18px;line-height:1.5}
+.donasi-tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid #d8e0e8;border-radius:10px;overflow:hidden}
+.donasi-tab{margin:0;border-radius:0;background:#fff;color:var(--navy);font-size:14px;padding:12px 8px}
+.donasi-tab.active{background:var(--red);color:#fff}
+.donasi-panel{margin-top:14px;border:1px solid #dce5ed;border-radius:14px;background:#f8fafc;padding:18px}
+.donasi-panel[hidden]{display:none}
+.donasi-processing{text-align:center;padding:22px 12px}
+.donasi-processing .icon{font-size:42px;margin-bottom:8px}
+.donasi-processing strong{display:block;color:var(--red);font-size:20px;margin-bottom:8px}
+.donasi-processing p{margin:0;color:var(--muted);line-height:1.55}
+.donasi-bank-title{font-size:18px;font-weight:900;color:var(--navy);margin:0 0 14px}
+.donasi-bank-row{background:#fff;border:1px solid #e1e7ee;border-radius:10px;padding:12px;margin-top:9px}
+.donasi-bank-label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:5px}
+.donasi-bank-value{font-weight:800;color:var(--navy);line-height:1.35}
+.donasi-bank-number{font-size:23px;color:var(--red);letter-spacing:1px}
+.donasi-info{margin-top:14px;padding:12px;border-radius:10px;background:#eef6ff;color:#29445d;font-size:13px;line-height:1.5}
+.donasi-close-bottom{margin-top:16px}
+@media(max-width:760px){
+  .donasi-dialog{padding:18px;max-height:88vh}
+  .donasi-title{font-size:21px}
+}
+
+
+.donasi-copy-wrap{display:flex;align-items:center;gap:10px}
+.donasi-copy-wrap .donasi-bank-number{flex:1}
+.donasi-copy-btn{width:auto;margin:0;padding:9px 12px;border:1px solid #ccd5df;border-radius:9px;background:#fff;color:var(--navy);font-size:13px;font-weight:800;white-space:nowrap}
+.donasi-copy-btn:hover{background:#f1f5f9}
+
 </style>
 </head>
 
@@ -330,6 +370,16 @@ body.submitting{cursor:progress;}
 
   <div id="hasilStatus" style="display:none; margin-top:15px;"></div>
 </section>
+
+
+      <section class="card donasi-card">
+        <h2>Open Donasi Sosial</h2>
+        <p class="note">Bersama kita bisa membantu sesama yang membutuhkan, klik dibawah ini</p>
+        <button type="button" class="donasi-open-btn" id="btnOpenDonasi">
+          ❤️ OPEN DONASI SOSIAL
+        </button>
+      </section>
+
     </aside>
   </div>
 </main>
@@ -339,6 +389,60 @@ body.submitting{cursor:progress;}
   Generasi Padjajaran Baru<br>
   <span class="note" style="color:#d9e2ec">Sekretariat : Jl.Amalgam RT 03/07 Desa Karang Asem Timur, Kec. Citeureup Kab.Bogor 16810</span>
 </footer>
+
+
+<!-- ===== POPUP OPEN DONASI SOSIAL ===== -->
+<div class="donasi-modal" id="donasiModal" hidden>
+  <div class="donasi-backdrop" id="donasiBackdrop"></div>
+
+  <div class="donasi-dialog" role="dialog" aria-modal="true" aria-labelledby="donasiTitle">
+    <button type="button" class="donasi-close" id="btnCloseDonasi" aria-label="Tutup">×</button>
+
+    <div class="donasi-title" id="donasiTitle">Open Donasi Sosial</div>
+    <p class="donasi-subtitle">Keikhlasanmu sangat bermanfaat untuk sesama.</p>
+
+    <div class="donasi-tabs">
+      <button type="button" class="donasi-tab active" id="tabQris">▦ &nbsp; QRIS</button>
+      <button type="button" class="donasi-tab" id="tabBank">🏦 &nbsp; Rekening Bank</button>
+    </div>
+
+    <div class="donasi-panel" id="panelQris">
+      <div class="donasi-processing">
+        <div class="icon">▦</div>
+        <strong>ON PROGRESS</strong>
+        <p>QRIS sedang dalam proses pembuatan.<br>Mohon tunggu,terima kasih.</p>
+      </div>
+    </div>
+
+    <div class="donasi-panel" id="panelBank" hidden>
+      <div class="donasi-bank-title">Rekening Donasi</div>
+
+      <div class="donasi-bank-row">
+        <span class="donasi-bank-label">BANK</span>
+        <div class="donasi-bank-value">Bank Syariah Indonesia (BSI)</div>
+      </div>
+
+      <div class="donasi-bank-row">
+        <span class="donasi-bank-label">NO. REKENING</span>
+        <div class="donasi-copy-wrap">
+          <div class="donasi-bank-value donasi-bank-number">7369120772</div>
+          <button type="button" class="donasi-copy-btn" id="btnSalinRekening">SALIN</button>
+        </div>
+      </div>
+
+      <div class="donasi-bank-row">
+        <span class="donasi-bank-label">ATAS NAMA</span>
+        <div class="donasi-bank-value">GENERASI PADJAJARAN BARU</div>
+      </div>
+
+      <div class="donasi-info">
+        Setiap donasi yang Anda berikan sangat berarti untuk membantu kegiatan sosial GEPARU dan masyarakat yang membutuhkan.
+      </div>
+    </div>
+
+    <button type="button" class="donasi-close-bottom" id="btnCloseDonasiBottom">TUTUP</button>
+  </div>
+</div>
 
 <script>
 /*
@@ -1400,6 +1504,82 @@ btnCekStatus.addEventListener("click", async function () {
   }
 
 });
+
+// ============================================
+// OPEN DONASI SOSIAL
+// ============================================
+const btnOpenDonasi = document.getElementById("btnOpenDonasi");
+const donasiModal = document.getElementById("donasiModal");
+const donasiBackdrop = document.getElementById("donasiBackdrop");
+const btnCloseDonasi = document.getElementById("btnCloseDonasi");
+const btnCloseDonasiBottom = document.getElementById("btnCloseDonasiBottom");
+const tabQris = document.getElementById("tabQris");
+const tabBank = document.getElementById("tabBank");
+const panelQris = document.getElementById("panelQris");
+const panelBank = document.getElementById("panelBank");
+
+function bukaDonasi() {
+  donasiModal.hidden = false;
+  donasiModal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function tutupDonasi() {
+  donasiModal.classList.remove("show");
+  donasiModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+function pilihDonasiTab(tab) {
+  const isQris = tab === "qris";
+
+  tabQris.classList.toggle("active", isQris);
+  tabBank.classList.toggle("active", !isQris);
+
+  panelQris.hidden = !isQris;
+  panelBank.hidden = isQris;
+}
+
+btnOpenDonasi.addEventListener("click", bukaDonasi);
+btnCloseDonasi.addEventListener("click", tutupDonasi);
+btnCloseDonasiBottom.addEventListener("click", tutupDonasi);
+donasiBackdrop.addEventListener("click", tutupDonasi);
+
+tabQris.addEventListener("click", function() {
+  pilihDonasiTab("qris");
+});
+
+tabBank.addEventListener("click", function() {
+  pilihDonasiTab("bank");
+});
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape" && !donasiModal.hidden) {
+    tutupDonasi();
+  }
+});
+
+
+// SALIN NOMOR REKENING DONASI
+const btnSalinRekening = document.getElementById("btnSalinRekening");
+
+if (btnSalinRekening) {
+  btnSalinRekening.addEventListener("click", async function() {
+    const nomorRekening = "7369120772";
+
+    try {
+      await navigator.clipboard.writeText(nomorRekening);
+      const teksAwal = btnSalinRekening.textContent;
+      btnSalinRekening.textContent = "TERSALIN";
+      setTimeout(function() {
+        btnSalinRekening.textContent = teksAwal;
+      }, 1500);
+    } catch (error) {
+      alert("Nomor rekening: " + nomorRekening);
+    }
+  });
+}
+
 </script>
 </body>
 </html>
