@@ -1012,6 +1012,15 @@ buktiInput.addEventListener("change", function() {
       rejected.join("<br>") +
       "<br><br>Video dari galeri harus berukuran maksimal 20 MB.";
     errorBox.style.display = "block";
+
+    // Tambahan: setelah video galeri >20 MB ditolak,
+    // otomatis arahkan layar ke notifikasi agar warga langsung melihatnya.
+    requestAnimationFrame(function() {
+      errorBox.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    });
   } else {
     errorBox.innerHTML = "";
     errorBox.style.display = "none";
