@@ -161,7 +161,12 @@ body.submitting{cursor:progress;}
 
 .camera-video-btn{display:none;width:100%;margin-top:10px;background:var(--navy);border:1px solid var(--navy);color:#fff;}
 .camera-video-btn:hover{background:#173b5d;}
-@media(max-width:760px){.camera-video-btn{display:block}}
+.camera-photo-btn{display:none;width:100%;margin-top:10px;background:var(--navy);border:1px solid var(--navy);color:#fff;}
+.camera-photo-btn:hover{background:#173b5d;}
+@media(max-width:760px){
+  .camera-photo-btn{display:block}
+  .camera-video-btn{display:block}
+}
 
 /* ===== OPEN DONASI SOSIAL ===== */
 .donasi-card{padding:22px;text-align:center}
@@ -318,8 +323,10 @@ body.submitting{cursor:progress;}
           <span><b>Tambah Foto / Video / Dokumen</b><br>
           <small>Pilih langsung dari galeri atau file di perangkat Anda</small></span>
         </div>
-        <input id="bukti" name="bukti" type="file" accept="image/*,video/*,.pdf,.doc,.docx" multiple hidden>
+        <input id="bukti" name="bukti" type="file" accept=".jpg,.jpeg,.png,.gif,.webp,.heic,.heif,.mp4,.mov,.m4v,.avi,.mkv,.webm,.3gp,.mpeg,.mpg,.pdf,.doc,.docx" multiple hidden>
         <input id="kameraVideo" type="file" accept="video/*" capture="environment" hidden>
+        <input id="kameraFoto" type="file" accept="image/*" capture="environment" hidden>
+        <button id="btnKameraFoto" type="button" class="camera-photo-btn">📷 Ambil Foto</button>
         <button id="btnKameraVideo" type="button" class="camera-video-btn">🎥 Rekam Video</button>
         <div id="previewGrid" class="preview-grid"></div>
 
@@ -1026,6 +1033,34 @@ buktiInput.addEventListener("change", function() {
     errorBox.style.display = "none";
   }
 
+  renderPreviews();
+});
+
+const kameraFotoInput = document.getElementById("kameraFoto");
+const btnKameraFoto = document.getElementById("btnKameraFoto");
+
+btnKameraFoto.addEventListener("click", function() {
+  kameraFotoInput.click();
+});
+
+kameraFotoInput.addEventListener("change", function() {
+  const incoming = Array.from(this.files);
+  const errorBox = document.getElementById("error");
+
+  this.value = "";
+
+  incoming.forEach(function(file) {
+    if (!file.type || !file.type.startsWith("image/")) return;
+
+    const exists = selectedFiles.some(function(oldFile) {
+      return oldFile.name === file.name && oldFile.size === file.size;
+    });
+
+    if (!exists) selectedFiles.push(file);
+  });
+
+  errorBox.innerHTML = "";
+  errorBox.style.display = "none";
   renderPreviews();
 });
 
