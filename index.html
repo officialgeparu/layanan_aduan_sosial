@@ -785,6 +785,111 @@ const buktiInput = document.getElementById("bukti");
 const previewGrid = document.getElementById("previewGrid");
 let selectedFiles = [];
 
+// ===== TAMBAHAN: SIMPAN FILE REVIEW AGAR TIDAK HILANG JIKA HP/BROWSER RELOAD =====
+// File yang SUDAH masuk Review disimpan sementara di IndexedDB.
+// File baru akan dihapus hanya setelah aduan benar-benar berhasil dikirim.
+const FILE_DRAFT_DB = "GEPARU_Draft_DB";
+const FILE_DRAFT_STORE = "reviewFiles";
+const FILE_DRAFT_KEY = "current";
+
+function bukaDBFileDraft() {
+  return new Promise(function(resolve, reject) {
+    if (!window.indexedDB) {
+      reject(new Error("IndexedDB tidak tersedia."));
+      return;
+    }
+
+    const request = indexedDB.open(FILE_DRAFT_DB, 1);
+
+    request.onupgradeneeded = function(event) {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(FILE_DRAFT_STORE)) {
+        db.createObjectStore(FILE_DRAFT_STORE);
+      }
+    };
+
+    request.onsuccess = function() { resolve(request.result); };
+    request.onerror = function() { reject(request.error); };
+  });
+}
+
+async function simpanDraftFiles() {
+  try {
+    const db = await bukaDBFileDraft();
+    await new Promise(function(resolve, reject) {
+      const tx = db.transaction(FILE_DRAFT_STORE, "readwrite");
+      const store = tx.objectStore(FILE_DRAFT_STORE);
+
+      const records = selectedFiles.map(function(file) {
+        return {
+          name: file.name,
+          type: file.type || "application/octet-stream",
+          lastModified: file.lastModified || Date.now(),
+          blob: file
+        };
+      });
+
+      store.put(records, FILE_DRAFT_KEY);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { reject(tx.error); };
+      tx.onabort = function() { reject(tx.error || new Error("Penyimpanan file dibatalkan.")); };
+    });
+    db.close();
+  } catch (e) {
+    // Jika penyimpanan browser gagal, jangan mengganggu fitur utama.
+  }
+}
+
+async function pulihkanDraftFiles() {
+  try {
+    const db = await bukaDBFileDraft();
+
+    const records = await new Promise(function(resolve, reject) {
+      const tx = db.transaction(FILE_DRAFT_STORE, "readonly");
+      const request = tx.objectStore(FILE_DRAFT_STORE).get(FILE_DRAFT_KEY);
+
+      request.onsuccess = function() { resolve(request.result || []); };
+      request.onerror = function() { reject(request.error); };
+    });
+
+    db.close();
+
+    if (!Array.isArray(records)) return;
+
+    selectedFiles = records.map(function(item) {
+      const blob = item.blob;
+      return new File(
+        [blob],
+        item.name,
+        {
+          type: item.type || blob.type || "application/octet-stream",
+          lastModified: item.lastModified || Date.now()
+        }
+      );
+    });
+
+    renderPreviews();
+  } catch (e) {
+    // Jika file draft tidak dapat dipulihkan, halaman tetap berjalan normal.
+  }
+}
+
+async function hapusDraftFiles() {
+  try {
+    const db = await bukaDBFileDraft();
+
+    await new Promise(function(resolve, reject) {
+      const tx = db.transaction(FILE_DRAFT_STORE, "readwrite");
+      tx.objectStore(FILE_DRAFT_STORE).delete(FILE_DRAFT_KEY);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function() { reject(tx.error); };
+      tx.onabort = function() { reject(tx.error || new Error("Penghapusan file dibatalkan.")); };
+    });
+
+    db.close();
+  } catch (e) {}
+}
+
 // ===== TAMBAHAN: SIMPAN ISIAN FORM AGAR TIDAK HILANG JIKA HP/BROWSER RELOAD =====
 // Data hanya dihapus setelah aduan benar-benar berhasil dikirim.
 const FORM_DRAFT_KEY = "geparu_form_draft_v1";
@@ -899,6 +1004,7 @@ function renderPreviews() {
     remove.addEventListener("click", function() {
       selectedFiles.splice(index, 1);
       renderPreviews();
+      simpanDraftFiles();
     });
     card.appendChild(remove);
 
@@ -913,7 +1019,7 @@ function renderPreviews() {
   const add = document.createElement("label");
   add.className = "add-more";
   add.htmlFor = "bukti";
-  add.innerHTML = '<span class="plus" aria-label="Tambah bukti">＋</span>';
+  add.innerHTML = '<span class="plus" aria-label="Tambah bukti">＋</span><small>File Galery</small>';
   previewGrid.appendChild(add);
 }
 
@@ -1114,6 +1220,7 @@ buktiInput.addEventListener("change", function() {
   }
 
   renderPreviews();
+  simpanDraftFiles();
 });
 
 const kameraFotoInput = document.getElementById("kameraFoto");
@@ -1144,6 +1251,7 @@ kameraFotoInput.addEventListener("change", function() {
   errorBox.innerHTML = "";
   errorBox.style.display = "none";
   renderPreviews();
+  simpanDraftFiles();
 });
 
 const kameraVideoInput = document.getElementById("kameraVideo");
@@ -1209,9 +1317,11 @@ kameraVideoInput.addEventListener("change", async function() {
   }
 
   renderPreviews();
+  simpanDraftFiles();
 });
 
 renderPreviews();
+pulihkanDraftFiles();
 
 const nomorWhatsAppInput = document.getElementById("nomorWhatsApp");
 
@@ -1611,8 +1721,10 @@ if (hasil.status !== "success") {
         </div>`;
       success.style.display = "block";
 
-      // Aduan sudah benar-benar berhasil dikirim, baru hapus draft lokal.
+      // Aduan sudah benar-benar berhasil dikirim, baru hapus semua draft lokal,
+      // termasuk file yang sebelumnya tersimpan di Review.
       hapusDraftForm();
+      hapusDraftFiles();
       form.reset();
       kategoriSelect.value = "";
       kategoriTrigger.value = "";
