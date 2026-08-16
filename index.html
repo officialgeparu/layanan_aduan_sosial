@@ -1833,6 +1833,51 @@ function tampilkanBerhasilSalin() {
 const nomorCekStatusInput = document.getElementById("nomorCekStatus");
 const btnCekStatus = document.getElementById("btnCekStatus");
 const hasilStatus = document.getElementById("hasilStatus");
+
+// ===== TAMBAHAN: SIMPAN NOMOR CEK STATUS JIKA HALAMAN REFRESH =====
+// Nomor tetap ada sampai proses cek status berhasil mendapatkan jawaban.
+// Setelah cek berhasil, nomor draft ini dihapus.
+const CEK_STATUS_DRAFT_KEY = "geparu_cek_status_draft";
+
+function simpanDraftCekStatus(nomor) {
+  try {
+    if (nomor) {
+      localStorage.setItem(CEK_STATUS_DRAFT_KEY, nomor);
+    }
+  } catch (e) {}
+}
+
+function hapusDraftCekStatus() {
+  try {
+    localStorage.removeItem(CEK_STATUS_DRAFT_KEY);
+  } catch (e) {}
+}
+
+function pulihkanDraftCekStatus() {
+  try {
+    const nomor = localStorage.getItem(CEK_STATUS_DRAFT_KEY);
+    if (nomor) {
+      nomorCekStatusInput.value = nomor;
+    }
+  } catch (e) {}
+}
+
+// Simpan setiap kali warga mengetik nomor aduan.
+// Jadi jika halaman refresh SEBELUM tombol CEK STATUS ditekan,
+// nomor yang sudah diketik tetap dipulihkan.
+nomorCekStatusInput.addEventListener("input", function() {
+  try {
+    const nomor = this.value.trim();
+    if (nomor) {
+      simpanDraftCekStatus(nomor);
+    } else {
+      hapusDraftCekStatus();
+    }
+  } catch (e) {}
+});
+
+pulihkanDraftCekStatus();
+
 // FORMAT TANGGAL AGAR MUDAH DIBACA
 function formatTanggalIndonesia(tanggal) {
   if (!tanggal) return "-";
@@ -1854,12 +1899,20 @@ btnCekStatus.addEventListener("click", async function () {
 
   const nomorAduan = nomorCekStatusInput.value.trim();
 
+  if (nomorAduan) {
+    simpanDraftCekStatus(nomorAduan);
+  }
+
   if (!nomorAduan) {
     hasilStatus.style.display = "block";
     hasilStatus.innerHTML =
       "⚠️ Silakan masukkan nomor aduan terlebih dahulu.";
     return;
   }
+
+  // Simpan sebelum pencarian. Jika browser/HP refresh saat proses berjalan,
+  // nomor aduan akan otomatis dikembalikan.
+  simpanDraftCekStatus(nomorAduan);
 
   hasilStatus.style.display = "block";
   hasilStatus.innerHTML =
@@ -1957,6 +2010,10 @@ btnCekStatus.addEventListener("click", async function () {
         </div>
       `;
     }
+
+    // Cek status sudah berhasil mendapatkan jawaban dari server.
+    // Sekarang draft nomor boleh dihapus.
+    hapusDraftCekStatus();
 
     // Setelah hasil diterima, tetap posisikan layar tepat pada hasil akhir.
     hasilStatus.scrollIntoView({ behavior: "smooth", block: "center" });
