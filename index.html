@@ -201,8 +201,7 @@ body.submitting{cursor:progress;}
 
 
 
-/* ===== TAMBAHAN TOMBOL QRIS SEMENTARA ===== */
-.donasi-qris-processing-old{display:none !important;}
+/* ===== TAMBAHAN TOMBOL & POPUP QRIS ===== */
 .donasi-qris-button{
   width:100%;
   margin-top:0;
@@ -216,7 +215,6 @@ body.submitting{cursor:progress;}
 .qris-info-dialog{position:relative;width:min(420px,100%);background:#fff;border-radius:18px;box-shadow:0 20px 60px #0007;padding:28px 22px;text-align:center}
 .qris-info-dialog strong{display:block;color:var(--navy);font-size:19px;line-height:1.45;margin-bottom:18px}
 .qris-info-close{width:auto;margin:0;padding:10px 24px;background:var(--red);color:#fff;border:0;border-radius:10px;font-weight:800}
-
 </style>
 </head>
 
@@ -425,11 +423,6 @@ body.submitting{cursor:progress;}
     </div>
 
     <div class="donasi-panel" id="panelQris">
-      <div class="donasi-processing donasi-qris-processing-old">
-        <div class="icon">▦</div>
-        <strong>ON PROGRESS</strong>
-        <p>QRIS sedang dalam proses pembuatan.<br>Mohon tunggu,terima kasih.</p>
-      </div>
       <button type="button" class="donasi-qris-button" id="btnTampilkanQris">▦ &nbsp; KLIK UNTUK MENAMPILKAN QRIS</button>
     </div>
 
@@ -1601,43 +1594,36 @@ if (btnSalinRekening) {
 
 
 
-// ===== TAMBAHAN POPUP QRIS SEMENTARA =====
-const btnTampilkanQris = document.getElementById("btnTampilkanQris");
-const qrisInfoModal = document.getElementById("qrisInfoModal");
-const qrisInfoBackdrop = document.getElementById("qrisInfoBackdrop");
-const btnTutupQrisInfo = document.getElementById("btnTutupQrisInfo");
+// ===== TAMBAHAN FUNGSI POPUP QRIS =====
+document.addEventListener("click", function(event) {
+  if (event.target.closest("#btnTampilkanQris")) {
+    const modal = document.getElementById("qrisInfoModal");
+    if (modal) {
+      modal.hidden = false;
+      modal.classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+  }
 
-function tampilkanQrisInfo() {
-  qrisInfoModal.hidden = false;
-  qrisInfoModal.classList.add("show");
-}
-
-function tutupQrisInfo() {
-  qrisInfoModal.classList.remove("show");
-  qrisInfoModal.hidden = true;
-}
-
-if (btnTampilkanQris) {
-  btnTampilkanQris.addEventListener("click", tampilkanQrisInfo);
-}
-if (btnTutupQrisInfo) {
-  btnTutupQrisInfo.addEventListener("click", tutupQrisInfo);
-}
-if (qrisInfoBackdrop) {
-  qrisInfoBackdrop.addEventListener("click", tutupQrisInfo);
-}
-
+  if (event.target.closest("#btnTutupQrisInfo") || event.target.closest("#qrisInfoBackdrop")) {
+    const modal = document.getElementById("qrisInfoModal");
+    if (modal) {
+      modal.classList.remove("show");
+      modal.hidden = true;
+      document.body.style.overflow = "";
+    }
+  }
+});
 </script>
 
 
-<!-- ===== POPUP KETERANGAN QRIS ===== -->
+<!-- ===== TAMBAHAN POPUP KETERANGAN QRIS ===== -->
 <div class="qris-info-modal" id="qrisInfoModal" hidden>
   <div class="qris-info-backdrop" id="qrisInfoBackdrop"></div>
   <div class="qris-info-dialog" role="dialog" aria-modal="true" aria-labelledby="qrisInfoTitle">
-    <strong id="qrisInfoTitle">Maaf layanan QRIS sedang dalam proses pembuatan.</strong>
+    <strong id="qrisInfoTitle">Maaf layanan QRIS sedang dalam proses pembuatan,untuk sementara bisa melalui rekening.</strong>
     <button type="button" class="qris-info-close" id="btnTutupQrisInfo">TUTUP</button>
   </div>
 </div>
-
 </body>
 </html>
