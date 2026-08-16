@@ -773,6 +773,7 @@ kategoriOptions.forEach(function(btn) {
     kategoriTrigger.value = value;
     kategoriTrigger.setCustomValidity("");
     kategoriTrigger.classList.add("has-value");
+    simpanDraftForm();
     kategoriOptions.forEach(function(item) {
       item.classList.toggle("selected", item === btn);
     });
@@ -783,6 +784,85 @@ kategoriOptions.forEach(function(btn) {
 const buktiInput = document.getElementById("bukti");
 const previewGrid = document.getElementById("previewGrid");
 let selectedFiles = [];
+
+// ===== TAMBAHAN: SIMPAN ISIAN FORM AGAR TIDAK HILANG JIKA HP/BROWSER RELOAD =====
+// Data hanya dihapus setelah aduan benar-benar berhasil dikirim.
+const FORM_DRAFT_KEY = "geparu_form_draft_v1";
+
+function simpanDraftForm() {
+  try {
+    const draft = {};
+    document.querySelectorAll("#aduanForm input, #aduanForm textarea, #aduanForm select").forEach(function(el) {
+      if (el.type === "file" || !el.name && el.id !== "kategoriTrigger") return;
+      const key = el.name || el.id;
+      if (el.type === "checkbox" || el.type === "radio") {
+        draft[key] = { type: el.type, checked: el.checked, value: el.value };
+      } else {
+        draft[key] = { type: el.type, value: el.value };
+      }
+    });
+
+    // Kategori memakai tombol custom, jadi nilainya disimpan terpisah.
+    const kategoriTriggerDraft = document.getElementById("kategoriTrigger");
+    if (kategoriTriggerDraft) {
+      draft.__kategoriTrigger = kategoriTriggerDraft.value || "";
+    }
+
+    localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(draft));
+  } catch (e) {
+    // Jangan sampai penyimpanan draft mengganggu fungsi utama formulir.
+  }
+}
+
+function pulihkanDraftForm() {
+  try {
+    const raw = localStorage.getItem(FORM_DRAFT_KEY);
+    if (!raw) return;
+    const draft = JSON.parse(raw);
+
+    document.querySelectorAll("#aduanForm input, #aduanForm textarea, #aduanForm select").forEach(function(el) {
+      if (el.type === "file") return;
+      const key = el.name || el.id;
+      const item = draft[key];
+      if (!item) return;
+
+      if (el.type === "checkbox" || el.type === "radio") {
+        el.checked = !!item.checked;
+      } else if (typeof item.value === "string") {
+        el.value = item.value;
+      }
+    });
+
+    const kategoriTriggerDraft = document.getElementById("kategoriTrigger");
+    const kategoriSelectDraft = document.getElementById("kategori");
+    if (kategoriTriggerDraft && draft.__kategoriTrigger) {
+      kategoriTriggerDraft.value = draft.__kategoriTrigger;
+      kategoriTriggerDraft.classList.add("has-value");
+    }
+    if (kategoriSelectDraft && draft.kategori && typeof draft.kategori.value === "string") {
+      kategoriSelectDraft.value = draft.kategori.value;
+    }
+  } catch (e) {
+    // Jika draft rusak, abaikan tanpa mengganggu halaman.
+  }
+}
+
+function hapusDraftForm() {
+  try {
+    localStorage.removeItem(FORM_DRAFT_KEY);
+  } catch (e) {}
+}
+
+// Simpan setiap perubahan agar data tetap tersedia walaupun halaman terpaksa reload
+// ketika kamera/video mengambil alih aplikasi.
+document.querySelectorAll("#aduanForm input, #aduanForm textarea, #aduanForm select").forEach(function(el) {
+  if (el.type === "file") return;
+  el.addEventListener("input", simpanDraftForm);
+  el.addEventListener("change", simpanDraftForm);
+});
+
+// Pulihkan setelah struktur form siap.
+pulihkanDraftForm();
 
 function renderPreviews() {
   previewGrid.innerHTML = "";
@@ -1040,6 +1120,8 @@ const kameraFotoInput = document.getElementById("kameraFoto");
 const btnKameraFoto = document.getElementById("btnKameraFoto");
 
 btnKameraFoto.addEventListener("click", function() {
+  // Pastikan isian terakhir tersimpan sebelum kamera dibuka.
+  simpanDraftForm();
   kameraFotoInput.click();
 });
 
@@ -1068,6 +1150,8 @@ const kameraVideoInput = document.getElementById("kameraVideo");
 const btnKameraVideo = document.getElementById("btnKameraVideo");
 
 btnKameraVideo.addEventListener("click", function() {
+  // Pastikan isian terakhir tersimpan sebelum kamera dibuka.
+  simpanDraftForm();
   kameraVideoInput.click();
 });
 
@@ -1527,6 +1611,8 @@ if (hasil.status !== "success") {
         </div>`;
       success.style.display = "block";
 
+      // Aduan sudah benar-benar berhasil dikirim, baru hapus draft lokal.
+      hapusDraftForm();
       form.reset();
       kategoriSelect.value = "";
       kategoriTrigger.value = "";
