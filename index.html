@@ -203,7 +203,7 @@ body.submitting{cursor:progress;}
 
 /* ===== TAMBAHAN QRIS ===== */
 .qris-image-wrap{text-align:center;margin-bottom:14px}
-.qris-image{display:block;width:min(280px,100%);height:auto;margin:0 auto;border-radius:12px;background:#fff;cursor:pointer;border:1px solid #dce5ed}
+.qris-image{display:block;width:min(280px,100%);height:auto;margin:0 auto;border-radius:12px;background:#fff;border:1px solid #dce5ed}
 .qris-scan-note{text-align:center;font-size:12px;color:var(--muted);margin:9px 0 0}
 .qris-popup{position:fixed;inset:0;z-index:11000;display:none;align-items:center;justify-content:center;padding:18px}
 .qris-popup.show{display:flex}
@@ -422,9 +422,8 @@ body.submitting{cursor:progress;}
     </div>
 
     <div class="donasi-panel" id="panelQris">
-
       <div class="qris-image-wrap">
-        <img class="qris-image" id="qrisImage" src="data:image/gif;base64,R0lGODlhhACEAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBVZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDVmQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMrzDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2YrAGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaqM2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kAZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmAmZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9VM/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//VZv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAACEAIQAAAj/AAEIHEiwoMGD+xIqTEhwocOHDg8CgLhPosWBFC9q3MjxYkaMFEMyRAixo8GPJlOqPFkSpEiUBWGmlLmyZkeYL0NKpHmzpU2POX1OVLiTKMmgSI2yHClwYcOkTo9CreiS6lKrMaciLcp0aFetXZ9qFYuVLFewIs+arQr1bNuqaqWi5ekVa9SmYOMC/SrUrdK6ZOmuxcs3rFS9Fu/WVey3sN2XGxVL/ot4cOK/gtli3pxW42THkSnD9cw5IumHlnOGBj16b9nWl1lfDQxZbm3XlivDRswY9turqk8/Njz7sPDcvpM21nl8t/HiuJ0THh50eebpyKFnJb6dOk7RrntH/5/++bX27N1po5Ye23RPx+VXmwfcnLxQ8e3x874PPv3z9uq5R997AsoXIHrooZVaafr9V9538Cln21bJRcjdfhYK+KCEwHE44IfX+YedZuuNaB+FHaIIIoP9YegdfxkG9xOAFVK3oGwr4jjjjg6WdqONNf7I45A94hhfkEiaSOSSRyrZZI5AOtliTXNVWWCNvy1m5ZZcevhjll2GKeZtImqp4phopsndhmeqSeZMU4734ZdWCpmkSg3KiR+bc9kp5YX14eljkVz6CaVNedKoJJ1VGsonnG2OtSOEGr75n3wymlndpDBW2pmcmJKpIKclahpgoome2mmWiK7KYqm6Lf8a6J4eUnrghFGaeums/YHZ6a0p5kpXqneqWqqtJM6H7InKxlkmrZF6+uKav7IHaa7LGRpqhsDqOuOT2RYr3KPJdtuqjrhqO+6r07bLI7jpihseu90OO+hKfFIK7XyxdmcvugQaK+2+12575Z/88hotwSahainC57arb6/OIpjsv81SC7Ci3nY88adlJkjxxi6Sy6zADJ/HHrx6usrtxX2tPHLG2Co8ML0ww0pltcyGaB27+YpacblYPsxRpkjnZW28CGd67cc3R/v0vZr6jGvQMQqt88lFg8zowUcP3XTMXI/tdddgG9gw0DM/ySraxKrc8tllQ+k03GKHbLPVARP8LSvEfs8p87Fk/2Sy4IDXnbK/OBN5+OKPzxxu3e82jvihgS9er7OQhzk54y8rnrfIWUsa7OdQWwwq3qaDTnPkhAO6utl9Mu365rG/rnXClOcMttttS+77svkFTzfmf3f8ddKyKz+88InfTqivzWN8d/T7dl698cydznrad6YeKMrcL1+4oy7zfvnbopcOPvbpqx2s9VSz/6zlIQK/cK1Kz+4x5/XjX+tG5T/iuYh87oPa9fTWPvXpb1M92539SCct1EnwfLuaV/Nwpz4OKjBvcXOeBms2QoGZcG0bDJzBVCe9CLqvYCh8Xwsvd0LaHW5qINsS+nLIttAJan8D/wwgD1+owhgyr3bwG6LELIfD7lVNgMLqoQzp50OD8e1/CQTg1rAoQwR2MHNSdNgWxUegBVowi9sbY/yMaLQzdjF8QqwgGFM4v/LFcIfuQhsLf6axNyYxirnjYMSo+MU/fu2QSxsh1pD4RDR9roYzVJMXdWg7SHrQc8/r0iN950YxTbJOleRkKB3HxDnSLGIU3OMdi9jAfslvfVSrXBVN6UqbHZBJpWxlBsO2sQdSz4nmuhrPXCdG3QHxdxh0oRzrmEZjQrCRzrTiMC25SwJCc5PMXCYxtXhKWw5uKl5Upfeid8vkWfOXg4zjK1kGzQ8GcmfvTB4e+ehEdMJTm8WkYJE+SVXP0Y2PUNhk4A/7SUdeOjCWrBRoE9mJSm+Ok2PpjOeQ9inPhJYzkmHc3Tq5GUJ2Eo+SFSXnKDmWvTiek5ssvKJHhwnSdk4zoYvMXxttd9I+ag+c69piJ6EY0Jgm85psRKM2g2nDmSqziUuy20tFGtJtKjGpi0zlNxeqUVwS0ZwIbeonSXZPSN60ltmkVEAAADs=" alt="QRIS Donasi" title="QRIS Donasi">
+        <img class="qris-image" id="qrisImage" src="data:image/gif;base64,R0lGODlhhACEAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBVZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDVmQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMrzDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2YrAGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaqM2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kAZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmAmZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9VM/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//VZv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAACEAIQAAAj/AAEIHEiwoMGD+xIqTEhwocOHDg8CgLhPosWBFC9q3MjxYkaMFEMyRAixo8GPJlOqPFkSpEiUBWGmlLmyZkeYL0NKpHmzpU2POX1OVLiTKMmgSI2yHClwYcOkTo9CreiS6lKrMaciLcp0aFetXZ9qFYuVLFewIs+arQr1bNuqaqWi5ekVa9SmYOMC/SrUrdK6ZOmuxcs3rFS9Fu/WVey3sN2XGxVL/ot4cOK/gtli3pxW42THkSnD9cw5IumHlnOGBj16b9nWl1lfDQxZbm3XlivDRswY9turqk8/Njz7sPDcvpM21nl8t/HiuJ0THh50eebpyKFnJb6dOk7RrntH/5/++bX27N1po5Ye23RPx+VXmwfcnLxQ8e3x874PPv3z9uq5R997AsoXIHrooZVaafr9V9538Cln21bJRcjdfhYK+KCEwHE44IfX+YedZuuNaB+FHaIIIoP9YegdfxkG9xOAFVK3oGwr4jjjjg6WdqONNf7I45A94hhfkEiaSOSSRyrZZI5AOtliTXNVWWCNvy1m5ZZcevhjll2GKeZtImqp4phopsndhmeqSeZMU4734ZdWCpmkSg3KiR+bc9kp5YX14eljkVz6CaVNedKoJJ1VGsonnG2OtSOEGr75n3wymlndpDBW2pmcmJKpIKclahpgoome2mmWiK7KYqm6Lf8a6J4eUnrghFGaeums/YHZ6a0p5kpXqneqWqqtJM6H7InKxlkmrZF6+uKav7IHaa7LGRpqhsDqOuOT2RYr3KPJdtuqjrhqO+6r07bLI7jpihseu90OO+hKfFIK7XyxdmcvugQaK+2+12575Z/88hotwSahainC57arb6/OIpjsv81SC7Ci3nY88adlJkjxxi6Sy6zADJ/HHrx6usrtxX2tPHLG2Co8ML0ww0pltcyGaB27+YpacblYPsxRpkjnZW28CGd67cc3R/v0vZr6jGvQMQqt88lFg8zowUcP3XTMXI/tdddgG9gw0DM/ySraxKrc8tllQ+k03GKHbLPVARP8LSvEfs8p87Fk/2Sy4IDXnbK/OBN5+OKPzxxu3e82jvihgS9er7OQhzk54y8rnrfIWUsa7OdQWwwq3qaDTnPkhAO6utl9Mu365rG/rnXClOcMttttS+77svkFTzfmf3f8ddKyKz+88InfTqivzWN8d/T7dl698cydznrad6YeKMrcL1+4oy7zfvnbopcOPvbpqx2s9VSz/6zlIQK/cK1Kz+4x5/XjX+tG5T/iuYh87oPa9fTWPvXpb1M92539SCct1EnwfLuaV/Nwpz4OKjBvcXOeBms2QoGZcG0bDJzBVCe9CLqvYCh8Xwsvd0LaHW5qINsS+nLIttAJan8D/wwgD1+owhgyr3bwG6LELIfD7lVNgMLqoQzp50OD8e1/CQTg1rAoQwR2MHNSdNgWxUegBVowi9sbY/yMaLQzdjF8QqwgGFM4v/LFcIfuQhsLf6axNyYxirnjYMSo+MU/fu2QSxsh1pD4RDR9roYzVJMXdWg7SHrQc8/r0iN950YxTbJOleRkKB3HxDnSLGIU3OMdi9jAfslvfVSrXBVN6UqbHZBJpWxlBsO2sQdSz4nmuhrPXCdG3QHxdxh0oRzrmEZjQrCRzrTiMC25SwJCc5PMXCYxtXhKWw5uKl5Upfeid8vkWfOXg4zjK1kGzQ8GcmfvTB4e+ehEdMJTm8WkYJE+SVXP0Y2PUNhk4A/7SUdeOjCWrBRoE9mJSm+Ok2PpjOeQ9inPhJYzkmHc3Tq5GUJ2Eo+SFSXnKDmWvTiek5ssvKJHhwnSdk4zoYvMXxttd9I+ag+c69piJ6EY0Jgm85psRKM2g2nDmSqziUuy20tFGtJtKjGpi0zlNxeqUVwS0ZwIbeonSXZPSN60ltmkVEAAADs=" alt="QRIS Donasi">
         <p class="qris-scan-note">Scan QRIS untuk donasi</p>
       </div>
       <div class="donasi-processing">
@@ -1601,6 +1600,7 @@ if (btnSalinRekening) {
 }
 
 
+
 // TAMBAHAN POPUP QRIS
 const qrisImage = document.getElementById("qrisImage");
 const qrisPopup = document.getElementById("qrisPopup");
@@ -1625,11 +1625,11 @@ if (qrisImage) qrisImage.addEventListener("click", bukaQrisPopup);
 if (qrisPopupClose) qrisPopupClose.addEventListener("click", tutupQrisPopup);
 if (qrisPopupBackdrop) qrisPopupBackdrop.addEventListener("click", tutupQrisPopup);
 
-// Jika halaman dibuka melalui URL QR dengan penanda ?qris=scan, tampilkan popup otomatis.
+// Jika halaman dibuka dengan penanda ?qris=scan, tampilkan popup otomatis.
 if (new URLSearchParams(window.location.search).get("qris") === "scan") {
   bukaQrisPopup();
 }
-
+</script>
 
 
   <!-- TAMBAHAN POPUP QRIS -->
@@ -1642,9 +1642,6 @@ if (new URLSearchParams(window.location.search).get("qris") === "scan") {
       <button type="button" class="qris-popup-close" id="qrisPopupClose">TUTUP</button>
     </div>
   </div>
-
-
-</script>
 
 </body>
 </html>
