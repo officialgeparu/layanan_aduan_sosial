@@ -159,6 +159,9 @@ body.submitting textarea{
 }
 body.submitting{cursor:progress;}
 
+.camera-video-btn{display:none;width:100%;margin-top:10px;background:var(--navy);border:1px solid var(--navy);color:#fff;}
+.camera-video-btn:hover{background:#173b5d;}
+@media(max-width:760px){.camera-video-btn{display:block}}
 
 /* ===== OPEN DONASI SOSIAL ===== */
 .donasi-card{padding:22px;text-align:center}
@@ -316,6 +319,8 @@ body.submitting{cursor:progress;}
           <small>Pilih langsung dari galeri atau file di perangkat Anda</small></span>
         </div>
         <input id="bukti" name="bukti" type="file" accept="image/*,video/*,.pdf,.doc,.docx" multiple hidden>
+        <input id="kameraVideo" type="file" accept="video/*" capture="environment" hidden>
+        <button id="btnKameraVideo" type="button" class="camera-video-btn">🎥 Rekam Video</button>
         <div id="previewGrid" class="preview-grid"></div>
 
         <label class="check">
@@ -825,41 +830,245 @@ function renderPreviews() {
   previewGrid.appendChild(add);
 }
 
+async function compressVideo(file, onStage) {
+  return new Promise(async function(resolve, reject) {
+    let objectUrl = null;
+    let video = null;
+    let canvas = null;
+    let recorder = null;
+    let animationFrame = null;
+    let sourceStream = null;
+    let outputStream = null;
+
+    try {
+      if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+        throw new Error("Perangkat/browser ini belum mendukung kompresi video otomatis.");
+      }
+
+      if (onStage) onStage("Membuka video...");
+
+      objectUrl = URL.createObjectURL(file);
+      video = document.createElement("video");
+      video.src = objectUrl;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+
+      await new Promise(function(res, rej) {
+        video.onloadedmetadata = res;
+        video.onerror = function() { rej(new Error("Video tidak dapat diproses.")); };
+      });
+
+      const maxSide = 720;
+      let width = video.videoWidth || 1280;
+      let height = video.videoHeight || 720;
+
+      if (width > maxSide || height > maxSide) {
+        if (width >= height) {
+          height = Math.round(height * maxSide / width);
+          width = maxSide;
+        } else {
+          width = Math.round(width * maxSide / height);
+          height = maxSide;
+        }
+      }
+
+      // Pastikan ukuran canvas aman dan tidak terlalu besar di HP.
+      width = Math.max(2, width - (width % 2));
+      height = Math.max(2, height - (height % 2));
+
+      canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d", { alpha: false });
+      if (!ctx) throw new Error("Video tidak dapat diproses di perangkat ini.");
+
+      const videoMimeTypes = [
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+        "video/mp4",
+        "video/webm;codecs=vp8,opus",
+        "video/webm"
+      ];
+      let mimeType = "";
+      for (const type of videoMimeTypes) {
+        if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(type)) {
+          mimeType = type;
+          break;
+        }
+      }
+
+      outputStream = canvas.captureStream(24);
+      sourceStream = typeof video.captureStream === "function"
+        ? video.captureStream()
+        : (typeof video.mozCaptureStream === "function" ? video.mozCaptureStream() : null);
+
+      if (sourceStream) {
+        sourceStream.getAudioTracks().forEach(function(track) {
+          try { outputStream.addTrack(track); } catch (e) {}
+        });
+      }
+
+      recorder = new MediaRecorder(outputStream, {
+        mimeType: mimeType || undefined,
+        videoBitsPerSecond: 1000000,
+        audioBitsPerSecond: 64000
+      });
+
+      const chunks = [];
+      recorder.ondataavailable = function(ev) {
+        if (ev.data && ev.data.size) chunks.push(ev.data);
+      };
+
+      const finished = new Promise(function(res, rej) {
+        recorder.onerror = function() { rej(new Error("Kompresi video gagal.")); };
+        recorder.onstop = function() { res(); };
+      });
+
+      recorder.start(1000);
+
+      const drawFrame = function() {
+        if (!video || video.ended || video.paused && video.currentTime >= video.duration) return;
+        ctx.drawImage(video, 0, 0, width, height);
+        const pct = video.duration ? Math.min(99, Math.round((video.currentTime / video.duration) * 100)) : 0;
+        if (onStage) onStage("Mengompres video... " + pct + "%");
+        animationFrame = requestAnimationFrame(drawFrame);
+      };
+
+      video.onended = function() {
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        try { ctx.drawImage(video, 0, 0, width, height); } catch (e) {}
+        if (recorder && recorder.state !== "inactive") recorder.stop();
+      };
+
+      await video.play();
+      drawFrame();
+      await finished;
+
+      const blob = new Blob(chunks, { type: mimeType || recorder.mimeType || "video/webm" });
+      if (!blob.size) throw new Error("Video gagal dikompres.");
+
+      const extension = blob.type.indexOf("mp4") >= 0 ? "mp4" : "webm";
+      const compressedName = file.name.replace(/\.[^.]+$/, "") + "." + extension;
+      resolve(new File([blob], compressedName, { type: blob.type, lastModified: Date.now() }));
+    } catch (err) {
+      reject(err instanceof Error ? err : new Error("Video gagal diproses."));
+    } finally {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      if (recorder && recorder.state !== "inactive") {
+        try { recorder.stop(); } catch (e) {}
+      }
+      if (sourceStream) sourceStream.getTracks().forEach(function(track) { track.stop(); });
+      if (outputStream) outputStream.getTracks().forEach(function(track) { track.stop(); });
+      if (video) {
+        try { video.pause(); } catch (e) {}
+        video.src = "";
+      }
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      video = null;
+      canvas = null;
+      recorder = null;
+      sourceStream = null;
+      outputStream = null;
+    }
+  });
+}
+
 buktiInput.addEventListener("change", function() {
   const incoming = Array.from(this.files);
-  const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
-  const videoExt = /\.(mp4|mov|m4v|avi|mkv|webm|3gp|mpeg|mpg)$/i;
   const errorBox = document.getElementById("error");
-  let rejected = [];
+
+  // FILE DARI GALERI/PERANGKAT TIDAK DIKOMPRES.
+  // Alur ini sengaja dipertahankan seperti semula.
+  this.value = "";
+
+  const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
+  const rejected = [];
 
   incoming.forEach(function(file) {
-    const isVideo = (file.type && file.type.startsWith("video/")) || videoExt.test(file.name);
+    const isVideo =
+      (file.type && file.type.startsWith("video/")) ||
+      /\.(mp4|mov|m4v|avi|mkv|webm|3gp|mpeg|mpg)$/i.test(file.name);
 
-    // HANYA VIDEO yang dibatasi maksimal 20 MB.
+    // VIDEO DARI GALERI/PERANGKAT: TIDAK DIKOMPRES.
+    // Jika lebih dari 20 MB, langsung ditolak dan TIDAK masuk review.
     if (isVideo && file.size > MAX_VIDEO_BYTES) {
-      rejected.push(file.name + " (" + (file.size / 1024 / 1024).toFixed(1) + " MB)");
+      rejected.push(
+        "Video \"" + file.name + "\" terlalu besar (" +
+        (file.size / 1024 / 1024).toFixed(1) + " MB). Maksimal 20 MB."
+      );
       return;
     }
 
     const exists = selectedFiles.some(function(oldFile) {
-      return oldFile.name === file.name &&
-             oldFile.size === file.size &&
-             oldFile.lastModified === file.lastModified;
+      return oldFile.name === file.name && oldFile.size === file.size;
     });
     if (!exists) selectedFiles.push(file);
   });
-
-  this.value = "";
 
   if (rejected.length) {
     errorBox.innerHTML =
       "<b>VIDEO TERLALU BESAR</b><br>" +
       rejected.join("<br>") +
-      "<br><br>Maksimal ukuran video adalah <b>20 MB</b>.";
+      "<br><br>Video dari galeri harus berukuran maksimal 20 MB.";
     errorBox.style.display = "block";
   } else {
-    // Jika warga mencoba upload lagi dan video baru sudah <= 20 MB,
-    // hapus notifikasi video sebelumnya agar tidak membingungkan.
+    errorBox.innerHTML = "";
+    errorBox.style.display = "none";
+  }
+
+  renderPreviews();
+});
+
+const kameraVideoInput = document.getElementById("kameraVideo");
+const btnKameraVideo = document.getElementById("btnKameraVideo");
+
+btnKameraVideo.addEventListener("click", function() {
+  kameraVideoInput.click();
+});
+
+kameraVideoInput.addEventListener("change", async function() {
+  const incoming = Array.from(this.files);
+  const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
+  const errorBox = document.getElementById("error");
+  let rejected = [];
+
+  this.value = "";
+
+  for (let i = 0; i < incoming.length; i++) {
+    const originalFile = incoming[i];
+
+    try {
+      // KHUSUS VIDEO YANG DIREKAM DARI TOMBOL KAMERA: kompres sebelum review.
+      const file = await compressVideo(originalFile, function(stage) {
+        errorBox.style.display = "block";
+        errorBox.innerHTML = "⏳ <b>Memproses video kamera</b><br>" + stage;
+      });
+
+      if (file.size > MAX_VIDEO_BYTES) {
+        rejected.push(
+          originalFile.name + " → setelah dikompres masih " +
+          (file.size / 1024 / 1024).toFixed(1) + " MB"
+        );
+        continue;
+      }
+
+      const exists = selectedFiles.some(function(oldFile) {
+        return oldFile.name === file.name && oldFile.size === file.size;
+      });
+      if (!exists) selectedFiles.push(file);
+    } catch (err) {
+      rejected.push(originalFile.name + " → " + (err.message || "gagal diproses"));
+    }
+  }
+
+  if (rejected.length) {
+    errorBox.innerHTML =
+      "<b>VIDEO KAMERA TIDAK DAPAT DIPROSES</b><br>" +
+      rejected.join("<br>") +
+      "<br><br>Silakan rekam video yang lebih singkat atau coba browser/perangkat lain.";
+    errorBox.style.display = "block";
+  } else {
     errorBox.innerHTML = "";
     errorBox.style.display = "none";
   }
@@ -929,6 +1138,9 @@ document.getElementById("aduanForm").addEventListener("submit", function(e) {
   progressBox.classList.add("show");
   document.getElementById("progressTitle").style.display = "block";
   document.getElementById("progressWarning").style.display = "block";
+
+  // Setelah tombol KIRIM ADUAN ditekan, langsung arahkan layar ke progress.
+  progressBox.scrollIntoView({ behavior: "smooth", block: "center" });
 
   let currentProgress = 0;
   let progressTimer = null;
@@ -1404,6 +1616,9 @@ btnCekStatus.addEventListener("click", async function () {
   hasilStatus.innerHTML =
     "⏳ Sedang mencari data aduan...";
 
+  // Langsung arahkan layar ke area hasil agar warga melihat proses pencarian.
+  hasilStatus.scrollIntoView({ behavior: "smooth", block: "center" });
+
   btnCekStatus.disabled = true;
 
   try {
@@ -1494,6 +1709,9 @@ btnCekStatus.addEventListener("click", async function () {
       `;
     }
 
+    // Setelah hasil diterima, tetap posisikan layar tepat pada hasil akhir.
+    hasilStatus.scrollIntoView({ behavior: "smooth", block: "center" });
+
   } catch (error) {
 
     hasilStatus.innerHTML = `
@@ -1508,6 +1726,9 @@ btnCekStatus.addEventListener("click", async function () {
     `;
 
     console.error(error);
+
+    // Jika terjadi error, warga tetap langsung melihat keterangannya.
+    hasilStatus.scrollIntoView({ behavior: "smooth", block: "center" });
 
   } finally {
 
