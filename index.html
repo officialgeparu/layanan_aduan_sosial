@@ -1087,6 +1087,13 @@ kameraVideoInput.addEventListener("change", async function() {
       const file = await compressVideo(originalFile, function(stage) {
         errorBox.style.display = "block";
         errorBox.innerHTML = "⏳ <b>Memproses video kamera</b><br>" + stage;
+
+        // Tambahan saja: arahkan layar ke notifikasi/proses kompresi
+        // agar warga langsung dapat melihat proses kompresi berlangsung.
+        errorBox.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
       });
 
       if (file.size > MAX_VIDEO_BYTES) {
