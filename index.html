@@ -2152,5 +2152,67 @@ document.addEventListener("click", function(event) {
     <button type="button" class="qris-info-close" id="btnTutupQrisInfo">TUTUP</button>
   </div>
 </div>
+
+<!-- MUSIK GEPARU -->
+<audio id="geparuMusic" loop preload="auto">
+  <source src="lagu-geparu.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicButton" type="button"
+  style="
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    z-index:9999;
+    border:none;
+    border-radius:50px;
+    padding:11px 16px;
+    background:#102a43;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+  ">
+  🔇 Putar Musik
+</button>
+
+<script>
+(function () {
+  const music = document.getElementById("geparuMusic");
+  const button = document.getElementById("musicButton");
+
+  let started = false;
+
+  function playMusic() {
+    music.play().then(() => {
+      started = true;
+      button.innerHTML = "🔊 Musik ON";
+    }).catch(() => {});
+  }
+
+  function stopMusic() {
+    music.pause();
+    button.innerHTML = "🔇 Putar Musik";
+  }
+
+  button.addEventListener("click", function () {
+    if (music.paused) {
+      playMusic();
+    } else {
+      stopMusic();
+    }
+  });
+
+  document.addEventListener("click", function firstInteraction() {
+    if (!started) {
+      playMusic();
+      started = true;
+    }
+
+    document.removeEventListener("click", firstInteraction);
+  }, { once: true });
+})();
+</script>
+
 </body>
 </html>
