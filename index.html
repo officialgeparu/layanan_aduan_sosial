@@ -224,6 +224,150 @@ body.submitting{cursor:progress;}
 .qris-info-dialog strong{display:block;color:var(--navy);font-size:19px;line-height:1.45;margin-bottom:18px}
 .qris-info-close{width:auto;margin:0;padding:10px 24px;background:var(--red);color:#fff;border:0;border-radius:10px;font-weight:800}
   /* =========================================================
+   GEPARU - DONASI SOSIAL
+   FULL BLUE THEME
+   Mengubah elemen merah popup donasi menjadi biru
+   ========================================================= */
+
+/* Popup donasi */
+.qris-info-modal{
+    --donasi-blue:#174ea6;
+    --donasi-blue2:#2563eb;
+}
+
+/* Judul popup */
+.qris-info-dialog h2,
+.qris-info-dialog h3,
+.qris-info-dialog strong{
+    color:#174ea6 !important;
+}
+
+/* SEMUA BUTTON DI DALAM POPUP */
+.qris-info-dialog button{
+    background:#174ea6 !important;
+    border-color:#174ea6 !important;
+    color:#ffffff !important;
+}
+
+/* Hover */
+.qris-info-dialog button:hover{
+    background:#2563eb !important;
+    border-color:#2563eb !important;
+}
+
+/* Tombol TAB QRIS / REKENING BANK */
+.qris-info-dialog .qris-tab,
+.qris-info-dialog .donasi-tab,
+.qris-info-dialog .tab-button,
+.qris-info-dialog [role="tab"]{
+    background:#ffffff !important;
+    border-color:#c9d8ee !important;
+    color:#174ea6 !important;
+}
+
+/* TAB YANG AKTIF */
+.qris-info-dialog .qris-tab.active,
+.qris-info-dialog .donasi-tab.active,
+.qris-info-dialog .tab-button.active,
+.qris-info-dialog [role="tab"][aria-selected="true"]{
+    background:#174ea6 !important;
+    border-color:#174ea6 !important;
+    color:#ffffff !important;
+}
+
+/* Tombol SALIN */
+.qris-info-dialog .copy-btn,
+.qris-info-dialog .donasi-copy-btn,
+.qris-info-dialog button[class*="copy"]{
+    background:#ffffff !important;
+    color:#174ea6 !important;
+    border:1px solid #9db8dc !important;
+}
+
+/* Hover SALIN */
+.qris-info-dialog .copy-btn:hover,
+.qris-info-dialog .donasi-copy-btn:hover,
+.qris-info-dialog button[class*="copy"]:hover{
+    background:#eef5ff !important;
+    color:#174ea6 !important;
+    border-color:#174ea6 !important;
+}
+
+/* Nomor rekening */
+.qris-info-dialog .rekening,
+.qris-info-dialog .rekening-number,
+.qris-info-dialog [class*="rekening"] strong{
+    color:#174ea6 !important;
+}
+
+/* Label informasi */
+.qris-info-dialog label,
+.qris-info-dialog .label{
+    color:#174ea6 !important;
+}
+
+/* Kotak informasi */
+.qris-info-dialog .info,
+.qris-info-dialog .info-box,
+.qris-info-dialog .donasi-info{
+    background:#eef5ff !important;
+    border-color:#d2e2f7 !important;
+    color:#173b6b !important;
+}
+
+/* Tombol TUTUP */
+.qris-info-close,
+.qris-info-dialog .qris-info-close{
+    background:#174ea6 !important;
+    border-color:#174ea6 !important;
+    color:#ffffff !important;
+}
+
+/* Hover TUTUP */
+.qris-info-close:hover,
+.qris-info-dialog .qris-info-close:hover{
+    background:#2563eb !important;
+    border-color:#2563eb !important;
+}
+
+/* Tombol X close di bagian atas */
+.qris-info-dialog .close,
+.qris-info-dialog .close-btn,
+.qris-info-dialog button[aria-label*="close"],
+.qris-info-dialog button[aria-label*="Close"]{
+    background:#eef5ff !important;
+    color:#174ea6 !important;
+    border-color:#d2e2f7 !important;
+}
+
+/* Semua teks merah di popup dipaksa biru */
+.qris-info-dialog [style*="color: red"],
+.qris-info-dialog [style*="color:red"],
+.qris-info-dialog [style*="#c62828"],
+.qris-info-dialog [style*="#d32f2f"],
+.qris-info-dialog [style*="#dc2626"]{
+    color:#174ea6 !important;
+}
+
+/* Semua background merah di popup dipaksa biru */
+.qris-info-dialog [style*="background:#c62828"],
+.qris-info-dialog [style*="background: #c62828"],
+.qris-info-dialog [style*="background:#d32f2f"],
+.qris-info-dialog [style*="background: #d32f2f"],
+.qris-info-dialog [style*="background:#dc2626"],
+.qris-info-dialog [style*="background: #dc2626"]{
+    background:#174ea6 !important;
+}
+
+/* Tampilan mobile */
+@media(max-width:700px){
+
+    .qris-info-dialog button{
+        min-height:44px;
+    }
+
+}
+  /* =========================================================
    GEPARU - LAYANAN ADUAN
    FINAL BLUE UI
    Hanya memperbaiki tampilan, tidak mengubah fungsi
