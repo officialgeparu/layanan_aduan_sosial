@@ -223,7 +223,29 @@ body.submitting{cursor:progress;}
 .qris-info-dialog{position:relative;width:min(420px,100%);background:#fff;border-radius:18px;box-shadow:0 20px 60px #0007;padding:28px 22px;text-align:center}
 .qris-info-dialog strong{display:block;color:var(--navy);font-size:19px;line-height:1.45;margin-bottom:18px}
 .qris-info-close{width:auto;margin:0;padding:10px 24px;background:var(--red);color:#fff;border:0;border-radius:10px;font-weight:800}
-  
+ .qris-download{
+  text-align:center;
+  margin-top:15px;
+}
+
+.qris-download a{
+  display:inline-block;
+  background:#1257b8;
+  color:#fff;
+  text-decoration:none;
+  padding:12px 22px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:15px;
+}
+
+.qris-download a:hover{
+  background:#0d4798;
+}
+
+.qris-download a:active{
+  transform:scale(.97);
+                   } 
 </style>
 </head>
 
@@ -440,6 +462,12 @@ body.submitting{cursor:progress;}
     <img src="https://officialgeparu.github.io/beranda_geparu/qris-geparu.png"
          alt="QRIS GEPARU"
          style="display:block;width:100%;max-width:360px;height:auto;margin:0 auto;border-radius:10px;">
+        <div class="qris-download">
+  <a href="https://officialgeparu.github.io/beranda_geparu/qris-geparu.png"
+     download="QRIS-GEPARU.png">
+    ⬇ Download QRIS
+  </a>
+        </div>
     <div style="font-size:18px;font-weight:700;color:#064fd0;margin-top:10px;">
         YAYASAN GEPARU
     </div>
