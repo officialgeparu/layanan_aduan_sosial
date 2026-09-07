@@ -2718,14 +2718,15 @@ document.addEventListener("click", function(event) {
     });
   }
 
-  function trackPageview(){
+  function trackPageview(customPath, customTitle){
+    const pagePath = customPath || (location.pathname + location.search);
     return send({
       action:"pageview",
       visitor_id:visitorId,
       session_id:sessionId,
-      page_path:location.pathname + location.search,
-      page_title:document.title,
-      page_url:location.href,
+      page_path:pagePath,
+      page_title:customTitle || document.title,
+      page_url:location.origin + pagePath,
       referrer:document.referrer || "",
       timezone:Intl.DateTimeFormat().resolvedOptions().timeZone || "",
       language:navigator.language || "",
@@ -2750,10 +2751,23 @@ document.addEventListener("click", function(event) {
         metadata:metadata || {}
       });
     },
-    trackPageview:trackPageview
+    trackPageview:trackPageview,
+    trackVirtualPage:function(name, title){
+      const safeName = String(name || "interaksi").toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+      return trackPageview(location.pathname + "#analytics-" + safeName, title || (document.title + " — " + name));
+    }
   };
 
   trackPageview();
+
+  function trackCekAduanHash(){
+    if (location.hash === "#cek-status" && window.GEPARU_ANALYTICS){
+      window.GEPARU_ANALYTICS.trackEvent("service_open", "layanan", "Cek Aduan", { service:"cek_aduan" });
+      window.GEPARU_ANALYTICS.trackVirtualPage("Cek Aduan", "Cek Aduan GEPARU");
+    }
+  }
+  trackCekAduanHash();
+  window.addEventListener("hashchange", trackCekAduanHash);
 })();
 </script>
 
