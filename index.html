@@ -2639,5 +2639,123 @@ document.addEventListener("click", function(event) {
   document.addEventListener("click", startMusic);
 })();
 </script>
+
+<!-- GEPARU PLATFORM ANALYTICS -->
+<script>
+(function(){
+  "use strict";
+
+  const ANALYTICS_ENDPOINT =
+    "https://fysaxpqpqexjnlpkbwap.supabase.co/functions/v1/geparu-analytics";
+
+  const VISITOR_KEY = "geparu_analytics_visitor_id";
+  const SESSION_KEY = "geparu_analytics_session_id";
+
+  function makeId(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "geparu-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function getOrCreate(storage, key){
+    try{
+      let value = storage.getItem(key);
+      if(!value){
+        value = makeId();
+        storage.setItem(key, value);
+      }
+      return value;
+    }catch(error){
+      return makeId();
+    }
+  }
+
+  const visitorId = getOrCreate(localStorage, VISITOR_KEY);
+  const sessionId = getOrCreate(sessionStorage, SESSION_KEY);
+
+  function detectDevice(){
+    const ua = navigator.userAgent || "";
+    if(/tablet|ipad/i.test(ua)) return "tablet";
+    if(/mobi|android/i.test(ua)) return "mobile";
+    return "desktop";
+  }
+
+  function detectOS(){
+    const ua = navigator.userAgent || "";
+    if(/windows/i.test(ua)) return "Windows";
+    if(/android/i.test(ua)) return "Android";
+    if(/iphone|ipad|ipod/i.test(ua)) return "iOS";
+    if(/mac os/i.test(ua)) return "macOS";
+    if(/linux/i.test(ua)) return "Linux";
+    return "Unknown";
+  }
+
+  function detectBrowser(){
+    const ua = navigator.userAgent || "";
+    if(/edg/i.test(ua)) return "Edge";
+    if(/opr|opera/i.test(ua)) return "Opera";
+    if(/firefox/i.test(ua)) return "Firefox";
+    if(/chrome|crios/i.test(ua)) return "Chrome";
+    if(/safari/i.test(ua)) return "Safari";
+    return "Unknown";
+  }
+
+  function send(payload){
+    return fetch(ANALYTICS_ENDPOINT, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload),
+      keepalive:true
+    })
+    .then(async function(response){
+      if(!response.ok){
+        const message = await response.text();
+        console.warn("GEPARU Analytics gagal:", response.status, message);
+      }
+      return response;
+    })
+    .catch(function(error){
+      console.warn("GEPARU Analytics error:", error);
+    });
+  }
+
+  function trackPageview(){
+    return send({
+      action:"pageview",
+      visitor_id:visitorId,
+      session_id:sessionId,
+      page_path:location.pathname + location.search,
+      page_title:document.title,
+      page_url:location.href,
+      referrer:document.referrer || "",
+      timezone:Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+      language:navigator.language || "",
+      screen_width:window.screen ? window.screen.width : null,
+      screen_height:window.screen ? window.screen.height : null,
+      device_type:detectDevice(),
+      operating_system:detectOS(),
+      browser:detectBrowser()
+    });
+  }
+
+  window.GEPARU_ANALYTICS = {
+    trackEvent:function(eventName, category, label, metadata){
+      return send({
+        action:"event",
+        visitor_id:visitorId,
+        session_id:sessionId,
+        event_name:eventName,
+        event_category:category || "",
+        event_label:label || "",
+        page_path:location.pathname + location.search,
+        metadata:metadata || {}
+      });
+    },
+    trackPageview:trackPageview
+  };
+
+  trackPageview();
+})();
+</script>
+
 </body>
 </html>
